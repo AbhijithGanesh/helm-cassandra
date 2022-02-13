@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.metadata.names.stateful_set }}
+  namespace: {{.Values.metadata.names.namespace}}
+spec:
+  serviceName: {{.Values.metadata.names.fullname}}
+  {{- if .Values.statefulset.replicas}}
+  replicas: {{ .Values.statefulset}}
+  {{- else}}
+  replicas: 1
+  {{- end}}
+  
+  selector:
+    matchLabels:
+      app: cassandra
+  template:
+    metadata:
+      labels:
+        app: cassandra
+    spec:
+      terminationGracePeriodSeconds: 1800
+      containers:
+        - name: cassandra
+          image: {{ .Values.statefulset.image.repository | nindent 12 }}
+          imagePullPolicy: {{ .Values.statefulset.imagepullPolicy | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.services.metrics.port}}
+              name: metrics
+            - containerPort: 7000
+              name: intra-node
+            - containerPort: 7001
+              name: tls-intra-node
+            - containerPort: 7199
+              name: jmx
+            - containerPort: 9042
+              name: cql
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 1Gi
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - nodetool drain
+          env:
+            - name: MAX_HEAP_SIZE
+              value: 512M
+            - name: HEAP_NEWSIZE
+              value: 100M
+            - name: CA
+            
+            - name: CASSANDRA_SEED_PROVIDER
+              value: "org.apache.cassandra.locator.SimpleSeedProvider"
+            - name: CASSANDRA_CLUSTER_NAME
+              value: {{.Values.cluster.clusterName}}
+            - name: CASSANDRA_DC
+              value: {{ .Values.cluster.datacenter }}
+            - name: CASSANDRA_RACK
+              value: {{ .Values.cluster.rack }}
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /ready-probe.sh
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          # These volume mounts are persistent. They are like inline claims,
+          # but not exactly because the names need to match exactly one of
+          # the stateful pod volumes.
+          # volumeMounts:
+          #   - name: cassandra-data
+          #     mountPath: /cassandra_data
+         {{- if .Values.metrics.enabled }}
+        - name: metrics
+          image: {{ .Values.metrics.image.repository}}
+          imagePullPolicy: {{ .Values.metrics.image.pullPolicy | quote }}
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.hostNetwork }}
+          env:
+            - name: CASSANDRA_DATACENTER
+              value: {{ .Values.cluster.datacenter }}
+            - name: CASSANDRA_ENDPOINT_SNITCH
+              value: {{ .Values.cluster.endpointSnitch }}
+            - name: CASSANDRA_EXPORTER_CONFIG_listenPort
+              value: {{ .Values.metrics.containerPorts.http | quote }}
+            - name:  CASSANDRA_EXPORTER_CONFIG_host
+              value: localhost:{{ .Values.containerPorts.jmx }}
+            - name: CASSANDRA_USER
+              value: {{ .Values.dbUser.user | quote }}
+            - name: CASSANDRA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "common.secrets.name" (dict "existingSecret" .Values.dbUser.existingSecret "context" $) }}
+                  key: {{ include "common.secrets.key" (dict "existingSecret" .Values.dbUser.existingSecret "key" "cassandra-password") }}
+            - name: CASSANDRA_CLIENT_ENCRYPTION
+              value: {{.Values.cassEncryption}}
+            - name: CASSANDRA_TRANSPORT_PORT_NUMBER
+              value: {{ .Values.containerPorts.intra | quote }}
+            {{- if .Values.containerPorts.jmx }}
+            - name: CASSANDRA_JMX_PORT_NUMBER
+              value: {{ .Values.containerPorts.jmx | quote }}
+            {{- end }}
+            {{- if .Values.containerPorts.cql }}
+            - name: CASSANDRA_CQL_PORT_NUMBER
+              value: {{ .Values.containerPorts.cql | quote }}
+            {{- end }}
+          
+          
+          {{- end }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.metrics.containerPorts.http | default "8080" }}
+              {{- if .Values.hostNetwork }}
+              hostPort: {{ .Values.metrics.containerPorts.http }}
+              {{- end }}
+              protocol: TCP
+            - name: jmx
+              containerPort: {{ .Values.metrics.containerPorts.jmx | default "5555" }}
+              {{- if .Values.hostNetwork }}
+              hostPort: {{ .Values.metrics.containerPorts.jmx }}
+              {{- end }}
+          {{- if .Values.metrics.resources }}
+          resources: {{- toYaml .Values.metrics.resources | nindent 12 }}
+          {{- end }}
+          {{- if not .Values.diagnosticMode.enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: metrics
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 20
+            timeoutSeconds: 45
+          {{- end }}
+        {{- end }}

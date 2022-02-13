@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.metadata.names.fullname  }}-headless
+  namespace: {{ .Values.metadata.names.Namespace }}
+spec:
+  selector: 
+    service: {{ .Values.services.metrics.selector}}
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - name: intra
+      port: 7000
+      targetPort: intra
+    - name: tls
+      port: 7001
+      targetPort: tls
+    - name: jmx 
+      port: 7199
+      targetPort: jmx
+    - name: cql
+      port: {{ .Values.services.cql.port }}
+      targetPort: cql
+    - name: metrics
+      port: {{ .Values.services.metrics.port}}
+      targetPort: metrics
+  selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
