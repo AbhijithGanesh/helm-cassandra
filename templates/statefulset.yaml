@@ -4,9 +4,9 @@ metadata:
   name: {{ .Values.metadata.names.stateful_set }}
   namespace: {{.Values.metadata.names.namespace}}
 spec:
-  serviceName: {{.Values.metadata.names.fullname}}
+  serviceName: {{.Values.metadata.names.fullname}}-headless
   {{- if .Values.statefulset.replicas}}
-  replicas: {{ .Values.statefulset}}
+  replicas: {{ .Values.statefulset.seeds.seedCount}}
   {{- else}}
   replicas: 1
   {{- end}}
@@ -58,8 +58,12 @@ spec:
               value: 512M
             - name: HEAP_NEWSIZE
               value: 100M
-            - name: CA
-            
+            - name: CASSANDRA_START_RPC
+              value: "true"
+            - name: CASSANDRA_BROADCAST_RPC_ADDRESS
+              value: {{ .Values.cluster.broadcastAddr}}
+            - name: CASSANDRA_RPC_ADDRESS
+              value: {{ .Values.cluster.rpcAddr}}
             - name: CASSANDRA_SEED_PROVIDER
               value: "org.apache.cassandra.locator.SimpleSeedProvider"
             - name: CASSANDRA_CLUSTER_NAME
@@ -80,12 +84,6 @@ spec:
                 - /ready-probe.sh
             initialDelaySeconds: 15
             timeoutSeconds: 5
-          # These volume mounts are persistent. They are like inline claims,
-          # but not exactly because the names need to match exactly one of
-          # the stateful pod volumes.
-          # volumeMounts:
-          #   - name: cassandra-data
-          #     mountPath: /cassandra_data
          {{- if .Values.metrics.enabled }}
         - name: metrics
           image: {{ .Values.metrics.image.repository}}
@@ -157,4 +155,4 @@ spec:
             initialDelaySeconds: 20
             timeoutSeconds: 45
           {{- end }}
-        {{- end }}
+   {{- end }}
