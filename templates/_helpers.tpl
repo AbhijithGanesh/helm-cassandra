@@ -69,12 +69,13 @@ Create the name of the service account to use
 
 {{- define "cassandra.seeds" -}}
 {{- $seeds := list }}
-{{- $fullname := .Values.metadata.names.fullname }}
+{{- $prename := .Values.metadata.names.stateful_set }}
+{{- $postname := .Values.metadata.names.fullname}}
 {{- $releaseNamespace := .Values.metadata.release.namespace }}
 {{- $clusterDomain := .Values.cluster.clusterDomain }}
 {{- $seedCount := .Values.cluster.seedCount | int }}
 {{- range $e, $i := until $seedCount }}
-{{- $seeds = append $seeds (printf "%s.set-%d.%s-headless.svc.%s" $fullname $i $releaseNamespace $clusterDomain) }}
+{{- $seeds = append $seeds (printf "%s-%d.%s.svc.%s.%s" $prename $i $postname $releaseNamespace $clusterDomain) }}
 {{- end }}
 {{- range .Values.cluster.extraSeeds }}
 {{- $seeds = append $seeds . }}
@@ -85,7 +86,7 @@ Create the name of the service account to use
 
 {{- define "common.labels.matchLabels" -}}
 app.kubernetes.io/name: {{ include "common.names.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ .Values.metadata.release.Name }}
 {{- end -}}
 
 {{- define "common.labels.standard" -}}

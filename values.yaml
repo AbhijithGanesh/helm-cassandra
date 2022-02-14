@@ -1,5 +1,3 @@
-service: {}
-
 storageclass: local-path
 imagePullSecrets: []
 nameOverride: ""
@@ -47,10 +45,12 @@ tolerations: []
 affinity: {}
 
 statefulset:
+  replicas: true
   seeds:
-    seedCount: 3
+    seedCount: 1
     clusterDomain: {}
-
+  prometheusEnabled: true
+  listenAddr: "auto"
   serviceName: "cass-stateful-set"
   image:
     repository: gcr.io/google-samples/cassandra:v13
@@ -97,6 +97,43 @@ services:
   externalTrafficPolicy: Cluster
   annotations: {}
 
+pvc:
+  name:
+  accessModes: ReadWriteOnce
+  volumeMode: Filesystem
+  resources: {}
+  storageclassname: local-path
+
+cluster:
+  clusterName: test-cluster
+  datacenter: "cass-dc"
+  rpcAddr: 0.0.0.0
+  broadcastAddr: 10.1.3.26
+  endpointSnitch: SimpleSnitch
+  seedCount: 3
+  clusterDomain: "cluster"
+  rack: "rack-1"
+
+ingress:
+  enabled: false
+
+diagnosticMode:
+  enabled: true
+
+dbUser:
+  user: "cass-test-user"
+  existingSecret: {}
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 45
+  periodSeconds: 25
+  timeoutSeconds: 5
+  successsThreshold: 1
+  failureThreshold: 5
+
+cassEncryption: true
+commonLabels: {}
 metrics:
   image:
     registry: docker.io
@@ -122,38 +159,3 @@ metrics:
   containerPorts:
     http: 8080
     jmx: 5555
-
-pvc:
-  name:
-  accessModes: ReadWriteOnce
-  volumeMode: Filesystem
-  resources: {}
-  storageclassname: local-path
-
-cluster:
-  clusterName: test-cluster
-  datacenter: "cass-dc"
-  endpointSnitch: SimpleSnitch
-  seedCount: 3
-  clusterDomain: "cluster"
-  rack: "rack-1"
-
-ingress:
-  enabled: false
-
-diagnosticMode:
-  enabled: false
-
-dbUser:
-  user: "cass-test-user"
-  existingSecret: {}
-
-livenessProbe:
-  enabled: true
-  initialDelaySeconds: 45
-  periodSeconds: 25
-  timeoutSeconds: 5
-  successsThreshold: 1
-  failureThreshold: 5
-
-cassEncryption: true

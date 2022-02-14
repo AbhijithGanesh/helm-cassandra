@@ -6,8 +6,7 @@ The pod can be accessed by finding _kubectl get pods_
 
 Once done, you can port-forward by using the command (If you haven't used custom ports)
 
-kubectl port-forward <pod-name> 8080 9042 
+kubectl port-forward <pod-name> 9042 
 
 If you have , you need to supply the custom values.
-
 © Abhijith Ganesh

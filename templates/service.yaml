@@ -26,6 +26,6 @@ spec:
     port: {{ .Values.services.cql.port}}
     nodePort: {{ .Values.services.cql.nodePort}}            
   - name: {{ .Values.services.metrics.name}}
-    port: {{ .Values.services.metrics.port}}
+    port: {{ .Values.metrics.containerPorts.http}}
     nodePort: {{ .Values.services.metrics.nodePort}}            
 
