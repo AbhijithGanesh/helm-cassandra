@@ -8,7 +8,5 @@ entries:
       version: 0.1.1
       urls:
         - https://abhijithganesh.github.io/helm-cassandra/CassLightweight-0.1.1.tgz
-      maintainers:
-          name: "Abhijith Ganesh"
-          
+
 generated: "2022-02-15T00:10:45.6792253+05:30"
