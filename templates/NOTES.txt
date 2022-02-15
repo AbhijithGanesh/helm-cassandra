@@ -1,12 +1,19 @@
+If you haven't applied the Peristent Volume Claim before, please apply then upgrade the process.
+You can edit the persistent volume claim variables.
+
 Great to see you deploy the Cassandra-Chart. You have succesfully deployed t
 the chart without any hazards. There are a couple of things you need to remember here
 
 To access the metrics via TCP/HTTP, you need to portforward the pod which is running.
-The pod can be accessed by finding _kubectl get pods_
+The pod can be accessed by finding kubectl get pods
 
 Once done, you can port-forward by using the command (If you haven't used custom ports)
 
-kubectl port-forward <pod-name> 9042 
+kubectl port-forward <pod-name> 9042 8080
+
+You can choose to port-forward 8080 if you want to view the metrics.
 
 If you have , you need to supply the custom values.
+
+
 © Abhijith Ganesh
