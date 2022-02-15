@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.metadata.names.stateful_set }}
+  name: {{ .Values.metadata.names.pod_Name }}
   namespace: {{.Values.metadata.names.namespace}}
 spec:
   serviceName: {{.Values.metadata.names.fullname}}
   {{- if .Values.statefulset.replicas}}
-  replicas: {{ .Values.statefulset.seeds.seedCount}}
+  replicas: {{ .Values.statefulset.seeds.seedCount }}
   {{- else}}
   replicas: 1
-  {{- end}}
+  {{- end }}
   
   selector:
     matchLabels:
@@ -29,7 +29,7 @@ spec:
       containers:
         - name: cassandra
           image: {{ .Values.statefulset.image.repository | nindent 12 }}
-          imagePullPolicy: {{ .Values.statefulset.imagepullPolicy | nindent 12 }}
+          imagePullPolicy: {{ .Values.statefulset.image.imagepullPolicy | nindent 12 }}
           ports:
             - containerPort: {{ .Values.metrics.containerPorts.http}}
               name: metrics

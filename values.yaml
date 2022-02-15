@@ -14,7 +14,7 @@ metadata:
   names:
     fullname: "cassandra-custom-chart"
     service_name: "cassandra-service"
-    stateful_set: "cassandra-pods"
+    pod_Name: "cassandra-pods"
     namespace: "default"
 
   labels:
@@ -37,7 +37,7 @@ affinity: {}
 statefulset:
   replicas: true
   seeds:
-    seedCount: 3
+    seedCount: 1
     clusterDomain: {}
   prometheusEnabled: true
   listenAddr: "auto"
@@ -45,8 +45,7 @@ statefulset:
   image:
     repository: gcr.io/google-samples/cassandra:v13
     tag: latest
-  imagepullPolicy: IfNotPresent
-  provisioner: local-path
+    imagepullPolicy: IfNotPresent
 
 tls:
   internodeEncryption: none
@@ -84,13 +83,6 @@ services:
   externalTrafficPolicy: Cluster
   annotations: {}
 
-pvc:
-  name:
-  accessModes: ReadWriteOnce
-  volumeMode: Filesystem
-  resources: {}
-  storageclassname: local-path
-
 cluster:
   clusterName: test-cluster
   datacenter: "cass-dc"
@@ -109,6 +101,8 @@ diagnosticMode:
 
 dbUser:
   user: "cass-test-user"
+  password: "cassandra"
+  condition: true
   existingSecret: {}
 
 livenessProbe:
@@ -121,6 +115,7 @@ livenessProbe:
 
 cassEncryption: true
 commonLabels: {}
+
 metrics:
   image:
     registry: docker.io
@@ -129,7 +124,6 @@ metrics:
     tag: latest
   enabled: true
   namespace: {}
-  annotations: {}
   serviceMonitor:
     jobLabel: ""
     interval: ""
@@ -148,14 +142,5 @@ metrics:
     jmx: 5555
 
 persistentVolume:
-  storageSize: "5Gi"
   name: "cass-persistent"
-  volumename: "casspersistentlocal-path"
-  storageclass: "local-path"
   claimName: "cass-pvc-claim"
-  reclaimPolicy: "Recycle"
-  volumeMode: "Filesystem"
-  volumeMount:
-    mountPath:
-  resources: {}
-  type: "local"

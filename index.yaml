@@ -1,3 +1,14 @@
 apiVersion: v1
-entries: {}
+entries: 
+  CassLightweight:
+    - apiVersion: v2
+      name: "Abhijith Ganesh's lightweight cassandra chart for stateful workloads"
+      home: https://github.com/AbhijithGanesh/helm-cassandra.git
+      description: "Extremely lightweight chart for spinning up clusters for dev-purposes"
+      version: 0.1.1
+      urls:
+        - https://abhijithganesh.github.io/helm-cassandra/CassLightweight-0.1.1.tgz
+      maintainers:
+          name: "Abhijith Ganesh"
+          
 generated: "2022-02-15T00:10:45.6792253+05:30"
