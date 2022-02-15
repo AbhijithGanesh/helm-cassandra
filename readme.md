@@ -51,6 +51,7 @@ To get username and password run the following commands
 <hr/>
 
 |**Variable**|**Description**|
+|:-------------|:----------------|
 |enabled| boolean: _true_ or _false_|
 |minReplicas| minimum number of replicas `default`: 1|
 |maxReplicas| Maximum number of replicas `default`: 100|
@@ -63,6 +64,7 @@ _(Sub directory of metadata, the tree follows this structure: metadata->names)_
 <hr/>
 
 |**Variable**|**Description**|
+|:-------------|:----------------|
 |pod_Name| Names for all pods. `default`: cassandra-pods|
 |namespace|Defines Namespace for the pods.|
 |service_Name|Defines service name for the pods|
@@ -72,6 +74,7 @@ _(Sub directory of metadata, the tree follows this structure: metadata->names)_
 <hr/>
 
 |**Variable**|**Description**|
+|:-------------|:----------------|
 |name| Defines name for persistent Volume. `default`: _cass-persistent_|
 |claimName|Defines claim name for the persistent volume. `default`: _cass-pvc-claim_|
 
@@ -80,6 +83,7 @@ _(Sub directory of metadata, the tree follows this structure: metadata->names)_
 <hr/>
 
 |**Variable**|**Description**|
+|:-------------|:----------------|
 |replicas|Boolean variable for enabling replicasets. `default`: _1_|
 |prometheusEnabled|Boolean variable for enabling prometheus. `default`: _true_|
 |serviceName|Service name for the statefulset. `default`:_cass-stateful-set_|
@@ -90,6 +94,7 @@ _(Sub directory of metadata, the tree follows this structure: metadata->names)_
 _This is the sub parameter of the stateful set_
 
 |**Variable**|**Description**|
+|:-------------|:----------------|
 |repository| Defines the repository name `default`: _bitnami/cassandra-exporter_|
 |tag| Defines the tag for the image being pulled. `default`: _latest_
 |imagepullPolicy|Defines the pull policy (like Always, Never, IfNotPresent) for the metric. `default`: _{}_|
@@ -99,6 +104,7 @@ _This is the sub parameter of the stateful set_
 <hr/>
 
 |**Variable**|**Description**|
+|:-------------|:----------------|
 |enabled| Defines boolean for the metrics service. `default`: _true_|
 |namespace|Defines the namespace for the metric. `default`: _{}_|
 
@@ -107,6 +113,7 @@ _This is the sub parameter of the stateful set_
 _This is the sub parameter of the metrics_
 
 |**Variable**|**Description**|
+|:-------------|:----------------|
 |registry| Defines the registry from which the image is pulled. `default`: _true_|
 |imagepullPolicy|Defines the pull policy (like Always, Never, IfNotPresent) for the metric. `default`: _{}_|
 |repository| Defines the repository name `default`: _bitnami/cassandra-exporter_|
