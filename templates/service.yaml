@@ -23,7 +23,7 @@ spec:
   {{- end }}
   ports:
   - name: {{ .Values.services.cql.name}}
-    port: {{ .Values.services.cql.port}}
+    port: {{ .Values.containerPorts.cql}}
     nodePort: {{ .Values.services.cql.nodePort}}            
   - name: {{ .Values.services.metrics.name}}
     port: {{ .Values.metrics.containerPorts.http}}

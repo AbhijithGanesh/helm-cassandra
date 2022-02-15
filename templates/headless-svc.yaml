@@ -30,7 +30,7 @@ spec:
       port: 7199
       targetPort: jmx
     - name: cql
-      port: {{ .Values.services.cql.port }}
+      port: {{ .Values.containerPorts.cql }}
       targetPort: cql
     - name: metrics
       port: {{ .Values.metrics.containerPorts.http}}

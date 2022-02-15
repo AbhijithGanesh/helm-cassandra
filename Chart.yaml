@@ -1,6 +1,10 @@
 apiVersion: v2
 name: CassLightweight
-description: A Helm chart for running Cassandra on Kuberentes with metrics.  
+description: A Helm chart for running Cassandra on Kuberentes with prometheus metrics.  
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "1.16.0"
+kubeVersion: ">=1.22.5"
+maintainers:
+ - name: Abhijith Ganesh
+   url: https://abhijithganesh.github.io

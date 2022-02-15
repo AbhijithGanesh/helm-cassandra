@@ -55,16 +55,6 @@ app.kubernetes.io/name: {{ include "workingDirec.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "workingDirec.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "workingDirec.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
 
 
 {{- define "cassandra.seeds" -}}
